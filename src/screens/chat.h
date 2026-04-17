@@ -1,6 +1,8 @@
 #include "screen_manager.h"
 #include <MeshClient.h>
 
+#include "../font.h"
+
 struct ChannelMessage {
    uint32_t timestamp;
 

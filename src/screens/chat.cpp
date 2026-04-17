@@ -3,6 +3,7 @@
 #include "../mesh_instance.h"
 #include <cstdint> 
 #include "../utilities.h"
+#include <string>
 
 void ChatScreen::readKeyboard(){
     char keyValue = 0;
@@ -62,9 +63,30 @@ void ChatScreen::setup()
 
 
     mesh_client.registerChannelMessageHandler([this](const mesh::GroupChannel &channel, mesh::Packet *pkt, uint32_t timestamp, const char *text) {
-        auto idx = mesh_client.findChannelIdx(channel);
+        std::vector<char> ws;
+        for( int i = 0;i < strlen(text); )
+        {
+            if ( text[i] == 0xF0 )
+            {
+                ws.push_back(0xEF);
+                ws.push_back(text[i+2]);
+                ws.push_back(text[i+3]);
 
-        String user_message = text;
+                i += 4;
+            }
+            else
+            {
+                ws.push_back(text[i]);
+                i += 1;
+            }
+        }
+        auto new_text = ws.data();
+
+
+        auto idx = mesh_client.findChannelIdx(channel);
+        
+
+        String user_message = std::string(ws.begin(), ws.end()).c_str();
 
         String s1, s2;
 
@@ -81,8 +103,19 @@ void ChatScreen::setup()
 void ChatScreen::renderMessage(String user, String text, bool sentBySelf) {
     int y = _nextMessagePos;
 
+    lv_font_t * imgfont = lv_imgfont_create(14, get_imgfont_path, NULL);
+    if(imgfont == NULL) {
+        LV_LOG_ERROR("imgfont init error");
+        return;
+    }
+
+    imgfont->fallback = LV_FONT_DEFAULT;
+    imgfont->line_height = 16;
+    imgfont->base_line = 3;
+
     auto label = lv_label_create(_messagesContainer);
     lv_label_set_text(label, user.c_str());
+    lv_obj_set_style_text_font(label, imgfont, LV_PART_MAIN);
     lv_obj_set_style_text_color(label, lv_color_hex(0x000000), LV_PART_MAIN);
     lv_obj_align(label, sentBySelf ? LV_ALIGN_TOP_RIGHT : LV_ALIGN_TOP_LEFT, 0, y);
 
@@ -94,13 +127,12 @@ void ChatScreen::renderMessage(String user, String text, bool sentBySelf) {
     lv_style_set_radius(&chatBoxStyle, 10);
     lv_style_set_bg_opa(&chatBoxStyle, LV_OPA_COVER);
     lv_style_set_bg_color(&chatBoxStyle, lv_palette_lighten(sentBySelf ? LV_PALETTE_BLUE : LV_PALETTE_GREY, 1));
-
-
-
+    
     
     label = lv_label_create(_messagesContainer);
     lv_obj_add_style(label, &chatBoxStyle, 0);
     lv_label_set_text(label, text.c_str());
+    lv_obj_set_style_text_font(label, imgfont, LV_PART_MAIN);
     lv_obj_set_style_text_color(label, lv_color_hex(0x000000), LV_PART_MAIN);
     lv_obj_align(label, sentBySelf ? LV_ALIGN_TOP_RIGHT : LV_ALIGN_TOP_LEFT, 0, y + 20);
     lv_obj_set_style_pad_all(label, 10, 0);

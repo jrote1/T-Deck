@@ -7,12 +7,14 @@
 
 #include <helpers/esp32/SerialBLEInterface.h>
 #include <Wire.h>
+#include "utilities/display.h"
 
 extern StdRNG fast_rng;
 extern SimpleMeshTables tables;
 extern DataStore store;
 extern MeshClient mesh_client;
 extern TwoWire internal_wire;
+extern Display display;
 
 extern void setup_initial();
 extern void setup_mesh();

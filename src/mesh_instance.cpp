@@ -11,6 +11,8 @@ DataStore store(SPIFFS, rtc_clock);
 
 MeshClient mesh_client(radio_driver, fast_rng, rtc_clock, tables, store);
 
+Display display(internal_wire);
+
 void setKeyboardBrightness(uint8_t value)
 {
     internal_wire.beginTransmission(LILYGO_KB_SLAVE_ADDRESS);
