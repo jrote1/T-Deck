@@ -31,7 +31,7 @@ jobs:
         run: pio run
 
       - name: upload binaries to release
-        uses: softprops/action-gh-release@v1
-        if: ${{startsWith(github.ref, 'refs/tags/') }}
+        uses: softprops/action-gh-release@v3
+        if: github.ref_type == 'tag'
         with:
             files: .pio/build/esp32s3_120_16_8-qio_opi/firmware.bin
