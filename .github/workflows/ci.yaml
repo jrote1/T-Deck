@@ -1,6 +1,11 @@
 name: PlatformIO CI
 
-on: [push]
+on:
+    push:
+        branches:
+        - main
+        tags:
+            - "*"
 
 jobs:
   build:
@@ -8,6 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+            submodules: 'true'
       - uses: actions/cache@v4
         with:
           path: |
